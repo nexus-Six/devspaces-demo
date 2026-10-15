@@ -1,0 +1,101 @@
+schemaVersion: 2.2.0
+metadata:
+  name: rest-service-jdk21
+  displayName: Rest Service (OpenJDK 21 / v2)
+  description: Quarkus rest-service demo on OpenJDK 21 — main branch (2.0.0-SNAPSHOT)
+  tags:
+    - java
+    - openjdk
+    - maven
+    - quarkus
+  projectType: quarkus
+  version: 2.0.0-SNAPSHOT
+# Update projects.git.remotes.origin to your GitHub URL after pushing.
+# Factory URLs that already target this repo/branch clone that revision; checkoutFrom
+# documents the intended branch for raw-devfile starts.
+attributes:
+  .vscode/extensions.json: |
+    {
+      "recommendations": [
+        "vscjava.vscode-java-pack",
+        "redhat.java",
+        "vscjava.vscode-java-debug",
+        "vscjava.vscode-java-test",
+        "vscjava.vscode-maven",
+        "vscjava.vscode-java-dependency",
+        "redhat.vscode-quarkus",
+        "redhat.vscode-xml",
+        "redhat.vscode-yaml"
+      ]
+    }
+projects:
+  - name: rest-service
+    git:
+      remotes:
+        origin: https://github.com/YOUR_ORG/rest-service.git
+      checkoutFrom:
+        revision: main
+components:
+  - name: tools
+    container:
+      image: registry.access.redhat.com/ubi9/openjdk-21:latest
+      args: ["tail", "-f", "/dev/null"]
+      memoryRequest: 1Gi
+      memoryLimit: 3Gi
+      cpuRequest: 500m
+      cpuLimit: "2"
+      mountSources: true
+      volumeMounts:
+        - name: m2
+          path: /home/user/.m2
+      endpoints:
+        - name: http-app
+          targetPort: 8080
+          protocol: http
+          exposure: public
+        - name: debug
+          targetPort: 5005
+          exposure: none
+      env:
+        - name: DEBUG_PORT
+          value: "5005"
+        - name: JAVA_OPTS_APPEND
+          value: "-Dquarkus.http.host=0.0.0.0"
+  - name: m2
+    volume:
+      size: 3Gi
+commands:
+  - id: package
+    exec:
+      component: tools
+      commandLine: "./mvnw -Dmaven.repo.local=/home/user/.m2/repository package -DskipTests"
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: build
+        isDefault: true
+  - id: test
+    exec:
+      component: tools
+      commandLine: "./mvnw -Dmaven.repo.local=/home/user/.m2/repository test"
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: test
+        isDefault: true
+  - id: quarkus-dev
+    exec:
+      component: tools
+      commandLine: "./mvnw -Dmaven.repo.local=/home/user/.m2/repository quarkus:dev -Dquarkus.http.host=0.0.0.0"
+      workingDir: ${PROJECT_SOURCE}
+      hotReloadCapable: true
+      group:
+        kind: run
+        isDefault: true
+  - id: quarkus-debug
+    exec:
+      component: tools
+      commandLine: "./mvnw -Dmaven.repo.local=/home/user/.m2/repository quarkus:dev -Dquarkus.http.host=0.0.0.0 -Ddebug=${DEBUG_PORT}"
+      workingDir: ${PROJECT_SOURCE}
+      hotReloadCapable: true
+      group:
+        kind: debug
+        isDefault: true
