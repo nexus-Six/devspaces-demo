@@ -1,15 +1,15 @@
 schemaVersion: 2.2.0
 metadata:
-  name: rest-service-jdk21
-  displayName: Rest Service (OpenJDK 21 / v2)
-  description: Quarkus rest-service demo on OpenJDK 21 — main branch (2.0.0-SNAPSHOT)
+  name: rest-service-jdk17
+  displayName: Rest Service (OpenJDK 17 / v1)
+  description: Quarkus rest-service demo on OpenJDK 17 — v1 maintenance branch (1.4.0-SNAPSHOT)
   tags:
     - java
     - openjdk
     - maven
     - quarkus
   projectType: quarkus
-  version: 2.0.0-SNAPSHOT
+  version: 1.4.0-SNAPSHOT
 # Update projects.git.remotes.origin to your GitHub URL after pushing.
 # Factory URLs that already target this repo/branch clone that revision; checkoutFrom
 # documents the intended branch for raw-devfile starts.
@@ -34,9 +34,9 @@ projects:
       remotes:
         origin: https://github.com/nexus-Six/devspaces-demo.git
       checkoutFrom:
-        revision: main
+        revision: v1
 components:
-  # Build OpenJDK 21 + git (base ubi9/openjdk-21 image does not ship git).
+  # Build OpenJDK 17 + git (base ubi9/openjdk-17 image does not ship git).
   - name: tools-image
     image:
       imageName: rest-service-tools:latest
