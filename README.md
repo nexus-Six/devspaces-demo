@@ -6,10 +6,10 @@ workspace with the **matching JDK** — no local tool installs required.
 Different branches intentionally use **different JDKs** so the demo illustrates the
 “wrong toolchain on my laptop” problem that Dev Spaces solves:
 
-| Branch | App version        | JDK  | Devfile image                         |
-|--------|--------------------|------|----------------------------------------|
-| `main` | `2.0.0-SNAPSHOT`   | 21   | `ubi9/openjdk-21`                      |
-| `v1`   | `1.4.0-SNAPSHOT`   | 17   | `ubi9/openjdk-17`                      |
+| Branch | App version        | JDK  | Devfile image                                      |
+|--------|--------------------|------|----------------------------------------------------|
+| `main` | `2.0.0-SNAPSHOT`   | 21   | `devspaces/udi-rhel9` + `JAVA_HOME` → JDK 21       |
+| `v1`   | `1.4.0-SNAPSHOT`   | 17   | `devspaces/udi-rhel9` + `JAVA_HOME` → JDK 17       |
 
 ## Open in Dev Spaces (demo links)
 
@@ -28,8 +28,9 @@ https://DEVSPACES_URL/#https://github.com/nexus-Six/devspaces-demo/tree/v1
 ```
 
 Each branch’s `devfile.yaml` sets `checkoutFrom.revision` to that branch and uses the
-matching OpenJDK container image. Dev Spaces clones the repo via its project-clone init
-container (git is not required inside the tools image).
+Dev Spaces **UDI** (`registry.redhat.io/devspaces/udi-rhel9`), which already includes
+`git` and multiple JDKs. The active JDK is selected with `JAVA_HOME` / `PATH`
+(21 on `main`, 17 on `v1`).
 
 ## Demo app page
 
