@@ -9,7 +9,7 @@ metadata:
     - maven
     - quarkus
   projectType: quarkus
-  version: 1.4.0-SNAPSHOT
+  version: 1.4.0-snapshot
 # Update projects.git.remotes.origin to your GitHub URL after pushing.
 # Factory URLs that already target this repo/branch clone that revision; checkoutFrom
 # documents the intended branch for raw-devfile starts.
