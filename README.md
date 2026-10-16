@@ -8,8 +8,8 @@ Different branches intentionally use **different JDKs** so the demo illustrates 
 
 | Branch | App version        | JDK  | Devfile image                         |
 |--------|--------------------|------|----------------------------------------|
-| `main` | `2.0.0-SNAPSHOT`   | 21   | `ubi9/openjdk-21` (+ git)              |
-| `v1`   | `1.4.0-SNAPSHOT`   | 17   | `ubi9/openjdk-17` (+ git)              |
+| `main` | `2.0.0-SNAPSHOT`   | 21   | `ubi9/openjdk-21`                      |
+| `v1`   | `1.4.0-SNAPSHOT`   | 17   | `ubi9/openjdk-17`                      |
 
 ## Open in Dev Spaces (demo links)
 
@@ -27,8 +27,9 @@ https://DEVSPACES_URL/#https://github.com/nexus-Six/devspaces-demo/tree/main
 https://DEVSPACES_URL/#https://github.com/nexus-Six/devspaces-demo/tree/v1
 ```
 
-Each branch’s `devfile.yaml` sets `checkoutFrom.revision` to that branch and builds a tools
-image from `.devfile/Dockerfile` with the matching OpenJDK + `git`.
+Each branch’s `devfile.yaml` sets `checkoutFrom.revision` to that branch and uses the
+matching OpenJDK container image. Dev Spaces clones the repo via its project-clone init
+container (git is not required inside the tools image).
 
 ## Demo app page
 
