@@ -35,7 +35,8 @@ projects:
 components:
   - name: tools
     container:
-      image: registry.access.redhat.com/ubi9/openjdk-17:latest
+      # UDI includes git + multiple JDKs; pin 17 for the v1 maintenance tooling story.
+      image: registry.redhat.io/devspaces/udi-rhel9:latest
       args: ["tail", "-f", "/dev/null"]
       memoryRequest: 1Gi
       memoryLimit: 3Gi
@@ -60,6 +61,10 @@ components:
           value: "5005"
         - name: DEMO_DEVSPACES_BASE_URL
           value: "https://devspaces.apps.YOUR_CLUSTER/"
+        - name: JAVA_HOME
+          value: /usr/lib/jvm/java-17-openjdk
+        - name: PATH
+          value: /usr/lib/jvm/java-17-openjdk/bin:/usr/share/maven/bin:/home/user/.local/bin:/usr/bin:/bin
         - name: JAVA_OPTS_APPEND
           value: "-Dquarkus.http.host=0.0.0.0"
   - name: m2
