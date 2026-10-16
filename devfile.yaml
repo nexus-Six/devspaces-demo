@@ -10,9 +10,6 @@ metadata:
     - quarkus
   projectType: quarkus
   version: 2.0.0-snapshot
-# Update projects.git.remotes.origin to your GitHub URL after pushing.
-# Factory URLs that already target this repo/branch clone that revision; checkoutFrom
-# documents the intended branch for raw-devfile starts.
 attributes:
   .vscode/extensions.json: |
     {
@@ -36,17 +33,9 @@ projects:
       checkoutFrom:
         revision: main
 components:
-  # Build OpenJDK 21 + git (base ubi9/openjdk-21 image does not ship git).
-  - name: tools-image
-    image:
-      imageName: rest-service-tools:latest
-      dockerfile:
-        uri: .devfile/Dockerfile
-        buildContext: .devfile
-        rootRequired: true
   - name: tools
     container:
-      image: rest-service-tools:latest
+      image: registry.access.redhat.com/ubi9/openjdk-21:latest
       args: ["tail", "-f", "/dev/null"]
       memoryRequest: 1Gi
       memoryLimit: 3Gi
@@ -57,8 +46,6 @@ components:
         - name: m2
           path: /home/user/.m2
       endpoints:
-        # secure: true → OpenShift edge TLS route (HTTPS in browser, HTTP to Quarkus).
-        # Without this, https://…-http-app… returns the router 503 "Application is not available".
         - name: http-app
           targetPort: 8080
           protocol: http
@@ -79,6 +66,14 @@ components:
     volume:
       size: 3Gi
 commands:
+  - id: install-git
+    exec:
+      component: tools
+      commandLine: "if ! command -v git &>/dev/null; then sudo microdnf install -y git && git --version; fi"
+      workingDir: /
+      group:
+        kind: build
+        isDefault: false
   - id: package
     exec:
       component: tools
@@ -113,3 +108,6 @@ commands:
       group:
         kind: debug
         isDefault: true
+events:
+  postStart:
+    - install-git
