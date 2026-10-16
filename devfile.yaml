@@ -29,16 +29,24 @@ attributes:
       ]
     }
 projects:
-  - name: rest-service
+  - name: devspaces-demo
     git:
       remotes:
-        origin: https://github.com/YOUR_ORG/rest-service.git
+        origin: https://github.com/nexus-Six/devspaces-demo.git
       checkoutFrom:
         revision: main
 components:
+  # Build OpenJDK 21 + git (base ubi9/openjdk-21 image does not ship git).
+  - name: tools-image
+    image:
+      imageName: rest-service-tools:latest
+      dockerfile:
+        uri: .devfile/Dockerfile
+        buildContext: .devfile
+        rootRequired: true
   - name: tools
     container:
-      image: registry.access.redhat.com/ubi9/openjdk-21:latest
+      image: rest-service-tools:latest
       args: ["tail", "-f", "/dev/null"]
       memoryRequest: 1Gi
       memoryLimit: 3Gi
@@ -49,9 +57,12 @@ components:
         - name: m2
           path: /home/user/.m2
       endpoints:
+        # secure: true → OpenShift edge TLS route (HTTPS in browser, HTTP to Quarkus).
+        # Without this, https://…-http-app… returns the router 503 "Application is not available".
         - name: http-app
           targetPort: 8080
           protocol: http
+          secure: true
           exposure: public
           path: /
         - name: debug
@@ -60,6 +71,8 @@ components:
       env:
         - name: DEBUG_PORT
           value: "5005"
+        - name: DEMO_DEVSPACES_BASE_URL
+          value: "https://devspaces.apps.cluster-l4zs4.dyn.redhatworkshops.io/"
         - name: JAVA_OPTS_APPEND
           value: "-Dquarkus.http.host=0.0.0.0"
   - name: m2

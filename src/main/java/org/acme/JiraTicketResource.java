@@ -24,6 +24,10 @@ public class JiraTicketResource {
     @ConfigProperty(name = "demo.devspaces.branch", defaultValue = "v1")
     String branch;
 
+    /** JDK major version required by the target branch (differs from main on purpose). */
+    @ConfigProperty(name = "demo.devspaces.jdk", defaultValue = "17")
+    String jdkVersion;
+
     @ConfigProperty(name = "demo.devspaces.devfile-path", defaultValue = "devfile.yaml")
     String devfilePath;
 
@@ -347,15 +351,16 @@ public class JiraTicketResource {
                     <p>
                       Customers on the <strong>1.4.x</strong> line hit a 500 when completing checkout.
                       We need a surgical fix on the maintenance branch — not on <code>main</code> (2.x / JDK 21).
+                      That line still runs on <strong>OpenJDK %s</strong>, which most laptops no longer have installed.
                     </p>
                     <ul>
                       <li>Affects version: <code>1.4.0-SNAPSHOT</code></li>
-                      <li>Runtime in prod: <strong>OpenJDK 21</strong></li>
+                      <li>Runtime in prod: <strong>OpenJDK %s</strong></li>
                       <li>Repo branch to use: <code>%s</code></li>
                     </ul>
                     <p>
-                      Please reproduce and patch in a cloud workspace so you do not need to install
-                      an older JDK / Quarkus toolchain on your laptop.
+                      Please reproduce and patch in a cloud workspace so you do not need to juggle
+                      multiple JDKs / Quarkus toolchains on your laptop.
                     </p>
                   </div>
 
@@ -363,9 +368,9 @@ public class JiraTicketResource {
                     <p>
                       <strong>Ready-to-code workspace</strong>
                       Clicking the button opens OpenShift Dev Spaces with branch
-                      <code>%s</code>, OpenJDK 21, Maven, and Java/Quarkus IDE extensions —
+                      <code>%s</code>, OpenJDK %s, Maven, and Java/Quarkus IDE extensions —
                       loaded from this repo’s <code>%s</code>.
-                      <span class="hint">Factory URL targets the Git branch so the matching in-repo devfile is applied automatically.</span>
+                      <span class="hint">Factory URL targets the Git branch so the matching in-repo devfile (and JDK image) is applied automatically.</span>
                     </p>
                     <a class="btn btn-primary" href="%s" target="_blank" rel="noopener">
                       Open Dev Spaces workspace
@@ -383,7 +388,7 @@ public class JiraTicketResource {
                   <div class="description">
                     <ul>
                       <li>Workspace opens from the Jira link with <code>%s</code> checked out</li>
-                      <li>Container JDK matches 21 (see app landing page badge)</li>
+                      <li>Container JDK matches %s (see app landing page badge) — different from <code>main</code> / JDK 21</li>
                       <li>Bug fixed and verified with <code>./mvnw quarkus:dev</code></li>
                     </ul>
                   </div>
@@ -396,7 +401,7 @@ public class JiraTicketResource {
                         <div class="comment-meta"><strong>Alex Lead</strong> · yesterday</div>
                         <p style="margin:0 0 0.5rem">
                           Dropped a Dev Spaces factory link so anyone on-call can jump straight into the
-                          1.4 / JDK 21 environment — no laptop setup.
+                          1.4 / JDK %s environment — no laptop setup.
                         </p>
                         <p style="margin:0" class="mono">
                           Branch factory:<br />
@@ -446,7 +451,7 @@ public class JiraTicketResource {
                   </div>
                   <div class="field">
                     <label>Environment</label>
-                    <div>OpenJDK 21 · Quarkus · branch <code>%s</code></div>
+                    <div>OpenJDK %s · Quarkus · branch <code>%s</code></div>
                   </div>
                 </aside>
 
@@ -458,17 +463,23 @@ public class JiraTicketResource {
             </body>
             </html>
             """.formatted(
-                factoryFromBranch,
-                branch,
-                branch,
-                devfilePath,
-                factoryFromBranch,
-                branch,
-                factoryFromBranch,
-                factoryFromBranch,
-                factoryFromDevfile,
-                factoryFromDevfile,
-                branch
+                factoryFromBranch, // primary CTA href
+                jdkVersion,        // description: maintenance JDK
+                jdkVersion,        // runtime in prod
+                branch,            // repo branch to use
+                branch,            // CTA branch
+                jdkVersion,        // CTA OpenJDK
+                devfilePath,       // CTA devfile name
+                factoryFromBranch, // secondary CTA href
+                branch,            // acceptance: checkout
+                jdkVersion,        // acceptance: container JDK
+                jdkVersion,        // comment: JDK environment
+                factoryFromBranch, // comment: branch factory href
+                factoryFromBranch, // comment: branch factory text
+                factoryFromDevfile,// comment: raw devfile href
+                factoryFromDevfile,// comment: raw devfile text
+                jdkVersion,        // sidebar: OpenJDK
+                branch             // sidebar: branch
             );
     }
 
