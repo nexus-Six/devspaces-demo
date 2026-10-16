@@ -1,35 +1,34 @@
 # rest-service — OpenShift Dev Spaces demo
 
 Quarkus sample used to show how a **devfile link** in GitHub opens an OpenShift Dev Spaces
-workspace with the matching JDK — no local tool installs required.
+workspace with the **matching JDK** — no local tool installs required.
+
+Different branches intentionally use **different JDKs** so the demo illustrates the
+“wrong toolchain on my laptop” problem that Dev Spaces solves:
 
 | Branch | App version        | JDK  | Devfile image                         |
 |--------|--------------------|------|----------------------------------------|
-| `main` | `2.0.0-SNAPSHOT`   | 21   | `ubi9/openjdk-21`                      |
-| `v1`   | `1.4.0-SNAPSHOT`   | 21   | `ubi9/openjdk-21`                      |
+| `main` | `2.0.0-SNAPSHOT`   | 21   | `ubi9/openjdk-21` (+ git)              |
+| `v1`   | `1.4.0-SNAPSHOT`   | 17   | `ubi9/openjdk-17` (+ git)              |
 
 ## Open in Dev Spaces (demo links)
 
-Replace `DEVSPACES_URL` with your cluster (for example `https://devspaces.apps.example.com`)
-and `YOUR_ORG/rest-service` with your GitHub repo.
+Replace `DEVSPACES_URL` with your cluster (for example `https://devspaces.apps.example.com`).
 
-**Current / latest (main, JDK 21):**
-
-```text
-https://DEVSPACES_URL/#https://github.com/YOUR_ORG/rest-service/tree/main
-```
-
-**Older release (v1) — for the “fix a bug without a laptop setup” story:**
+**Current / latest (`main`, JDK 21):**
 
 ```text
-https://DEVSPACES_URL/#https://github.com/YOUR_ORG/rest-service/tree/v1
+https://DEVSPACES_URL/#https://github.com/nexus-Six/devspaces-demo/tree/main
 ```
 
-You can also paste a raw `devfile.yaml` URL; each branch’s `devfile.yaml` sets
-`checkoutFrom.revision` to that branch and uses the matching OpenJDK image.
+**Maintenance line (`v1`, JDK 17) — “fix a bug without installing an old JDK”:**
 
-Before first use, update the `origin` remote under `projects` in each branch’s `devfile.yaml`
-to your real GitHub URL.
+```text
+https://DEVSPACES_URL/#https://github.com/nexus-Six/devspaces-demo/tree/v1
+```
+
+Each branch’s `devfile.yaml` sets `checkoutFrom.revision` to that branch and builds a tools
+image from `.devfile/Dockerfile` with the matching OpenJDK + `git`.
 
 ## Demo app page
 
@@ -47,10 +46,11 @@ published **http-app** endpoint from the IDE Ports / popup (“Open in New Tab�
 ### Fake Jira ticket (Dev Spaces hand-off)
 
 Open <http://localhost:8080/jira> — a mock Jira issue with an
-**Open in OpenShift Dev Spaces** button that points at the `v1` branch / `devfile.yaml`.
+**Open in OpenShift Dev Spaces** button that points at the `v1` branch (JDK 17) / `devfile.yaml`.
 
 Configure the factory link: put the cluster Dev Spaces URL in a local **`.env`**
-(gitignored — copy from `.env.example`):
+(gitignored — copy from `.env.example`), or rely on the workshop default in
+`application.properties` / the `DEMO_DEVSPACES_BASE_URL` env in `devfile.yaml`.
 
 ```shell
 cp .env.example .env
@@ -60,8 +60,9 @@ cp .env.example .env
 Repo / branch defaults live in `src/main/resources/application.properties`:
 
 ```properties
-demo.github.repo=https://github.com/YOUR_ORG/rest-service
+demo.github.repo=https://github.com/nexus-Six/devspaces-demo
 demo.devspaces.branch=v1
+demo.devspaces.jdk=17
 ```
 
 Classic hello endpoint: <http://localhost:8080/hello>
