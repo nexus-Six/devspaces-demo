@@ -14,7 +14,7 @@ class DemoPageResourceTest {
           .when().get("/")
           .then()
              .statusCode(200)
-             .body(containsString("App version 2.0.0-SNAPSHOT"))
+             .body(containsString("App version 1.4.0-SNAPSHOT"))
              .body(containsString("Quarkus Mission Control"));
     }
 }
