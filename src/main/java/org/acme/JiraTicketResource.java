@@ -374,8 +374,9 @@ public class JiraTicketResource {
 
                   <div class="callout">
                     <strong>Demo tip</strong>
-                    Update <code>demo.devspaces.base-url</code> and <code>demo.github.repo</code>
-                    in <code>application.properties</code> to your cluster and GitHub remote before presenting.
+                    Set <code>DEMO_DEVSPACES_BASE_URL</code> in local <code>.env</code>
+                    and update <code>demo.github.repo</code> in <code>application.properties</code>
+                    before presenting.
                   </div>
 
                   <div class="section-title">Acceptance criteria</div>

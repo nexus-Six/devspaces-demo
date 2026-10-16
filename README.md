@@ -37,17 +37,29 @@ to your real GitHub URL.
 ./mvnw quarkus:dev
 ```
 
-Open <http://localhost:8080/> — the page shows the **app version** and the **running Java version**.
+Open <http://localhost:8080/> locally — the page shows the **app version** and the **running Java version**.
+
+In **OpenShift Dev Spaces**, do not use `localhost` from your laptop browser. After the app starts, open the
+published **http-app** endpoint from the IDE Ports / popup (“Open in New Tab”). The app binds to
+`0.0.0.0:8080` via `quarkus.http.host` so that Route can reach it even when you launch with
+**Run Quarkus** (not only the `quarkus-dev` task).
 
 ### Fake Jira ticket (Dev Spaces hand-off)
 
 Open <http://localhost:8080/jira> — a mock Jira issue with an
 **Open in OpenShift Dev Spaces** button that points at the `v1` branch / `devfile.yaml`.
 
-Configure the factory link in `src/main/resources/application.properties`:
+Configure the factory link: put the cluster Dev Spaces URL in a local **`.env`**
+(gitignored — copy from `.env.example`):
+
+```shell
+cp .env.example .env
+# edit DEMO_DEVSPACES_BASE_URL=https://devspaces.apps.YOUR_CLUSTER
+```
+
+Repo / branch defaults live in `src/main/resources/application.properties`:
 
 ```properties
-demo.devspaces.base-url=https://devspaces.apps.YOUR_CLUSTER
 demo.github.repo=https://github.com/YOUR_ORG/rest-service
 demo.devspaces.branch=v1
 ```

@@ -53,6 +53,7 @@ components:
           targetPort: 8080
           protocol: http
           exposure: public
+          path: /
         - name: debug
           targetPort: 5005
           exposure: none
