@@ -34,7 +34,7 @@ projects:
       remotes:
         origin: https://github.com/nexus-Six/devspaces-demo.git
       checkoutFrom:
-        revision: main
+        revision: master
 components:
   # Build OpenJDK 21 + git (base ubi9/openjdk-21 image does not ship git).
   - name: tools-image

@@ -8,17 +8,17 @@ Different branches intentionally use **different JDKs** so the demo illustrates 
 
 | Branch | App version        | JDK  | Devfile image                         |
 |--------|--------------------|------|----------------------------------------|
-| `main` | `2.0.0-SNAPSHOT`   | 21   | `ubi9/openjdk-21` (+ git)              |
-| `v1`   | `1.4.0-SNAPSHOT`   | 17   | `ubi9/openjdk-17` (+ git)              |
+| `master` | `2.0.0-SNAPSHOT` | 21   | `devspaces/udi-rhel9` + `JAVA_HOME` → JDK 21 |
+| `v1`     | `1.4.0-SNAPSHOT` | 17   | `devspaces/udi-rhel9` + `JAVA_HOME` → JDK 17 |
 
 ## Open in Dev Spaces (demo links)
 
 Replace `DEVSPACES_URL` with your cluster (for example `https://devspaces.apps.example.com`).
 
-**Current / latest (`main`, JDK 21):**
+**Current / latest (`master`, JDK 21):**
 
 ```text
-https://DEVSPACES_URL/#https://github.com/nexus-Six/devspaces-demo/tree/main
+https://DEVSPACES_URL/#https://github.com/nexus-Six/devspaces-demo/tree/master
 ```
 
 **Maintenance line (`v1`, JDK 17) — “fix a bug without installing an old JDK”:**
@@ -27,8 +27,8 @@ https://DEVSPACES_URL/#https://github.com/nexus-Six/devspaces-demo/tree/main
 https://DEVSPACES_URL/#https://github.com/nexus-Six/devspaces-demo/tree/v1
 ```
 
-Each branch’s `devfile.yaml` sets `checkoutFrom.revision` to that branch and builds a tools
-image from `.devfile/Dockerfile` with the matching OpenJDK + `git`.
+Each branch’s `devfile.yaml` sets `checkoutFrom.revision` to that branch and pins the
+matching JDK via `JAVA_HOME` on the UDI tools image.
 
 ## Demo app page
 

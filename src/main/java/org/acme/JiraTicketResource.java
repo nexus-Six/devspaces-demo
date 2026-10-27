@@ -24,7 +24,7 @@ public class JiraTicketResource {
     @ConfigProperty(name = "demo.devspaces.branch", defaultValue = "v1")
     String branch;
 
-    /** JDK major version required by the target branch (differs from main on purpose). */
+    /** JDK major version required by the target branch (differs from master on purpose). */
     @ConfigProperty(name = "demo.devspaces.jdk", defaultValue = "17")
     String jdkVersion;
 
@@ -353,7 +353,7 @@ public class JiraTicketResource {
                       <strong>“Quarkus rocks”</strong> tee to the cart, but
                       <strong>Checkout</strong> always shows an error popup
                       (<code>Payment gateway returned HTTP 500</code>).
-                      Reproduce on the maintenance branch — not on <code>main</code> (2.x / JDK 21).
+                      Reproduce on the maintenance branch — not on <code>master</code> (2.x / JDK 21).
                       That line still runs on <strong>OpenJDK %s</strong>, which most laptops no longer have installed.
                     </p>
                     <ul>
@@ -391,7 +391,7 @@ public class JiraTicketResource {
                   <div class="description">
                     <ul>
                       <li>Workspace opens from the Jira link with <code>%s</code> checked out</li>
-                      <li>Container JDK matches %s (see app landing page badge) — different from <code>main</code> / JDK 21</li>
+                      <li>Container JDK matches %s (see app landing page badge) — different from <code>master</code> / JDK 21</li>
                       <li>Checkout on <code>/shop/</code> succeeds after flipping <code>CHECKOUT_BUG</code> to <code>false</code></li>
                       <li>Verified with <code>./mvnw quarkus:dev</code> (or <code>quarkus dev</code>)</li>
                     </ul>

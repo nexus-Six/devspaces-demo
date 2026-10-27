@@ -78,7 +78,7 @@ spec:
             kind: ClusterInterceptor
           params:
             - name: filter
-              value: "body.ref == 'refs/heads/master' || body.ref == 'refs/heads/main'"
+              value: "body.ref == 'refs/heads/master' || body.ref == 'refs/heads/v1'"
       bindings:
         - ref: github-push-binding
       template:
