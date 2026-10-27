@@ -59,6 +59,10 @@ spec:
     - name: CONTEXT
       type: string
       default: .
+    - name: IGNOREFILE
+      type: string
+      default: src/main/docker/dockerignore.pipeline
+      description: Dockerignore that keeps sources (root .dockerignore is for prebuilt JVM images)
   workspaces:
     - name: source
   steps:
@@ -81,10 +85,12 @@ spec:
         IMAGE="$(params.IMAGE)"
         DOCKERFILE="$(params.DOCKERFILE)"
         CONTEXT="$(params.CONTEXT)"
-        echo "Building ${IMAGE} from ${DOCKERFILE}"
+        IGNOREFILE="$(params.IGNOREFILE)"
+        echo "Building ${IMAGE} from ${DOCKERFILE} (ignorefile=${IGNOREFILE})"
         buildah bud --storage-driver="${STORAGE_DRIVER}" \
           --isolation="${BUILDAH_ISOLATION}" \
           --layers=false \
+          --ignorefile "${IGNOREFILE}" \
           -f "${DOCKERFILE}" \
           -t "${IMAGE}" \
           "${CONTEXT}"
