@@ -1,0 +1,17 @@
+# Images pre-pulled onto every node so Dev Spaces workspaces start faster.
+# Format: one image reference per line. Lines starting with # are ignored.
+#
+# Prefer the same refs workspaces actually use (see: oc get pods -n <user>-devspaces -o yaml).
+# Digests avoid :latest drift during a live demo; retarget after a Dev Spaces upgrade.
+#
+# Tools image used by v1 (and often by UDI-based workspaces)
+registry.redhat.io/devspaces/udi-rhel9:latest
+#
+# Che Code IDE + gateway + project clone (from current cluster workspace)
+registry.redhat.io/devspaces/code-rhel9@sha256:692fd1892e8c204689c94a9f24b61fe90f40de078ce5d786c8ba031e1dd4241d
+registry.redhat.io/devspaces/traefik-rhel9@sha256:a94ae6a26c77edaa1f454beb305fef2f5b5411be99b8c50ee5c0c0d544a0d88c
+registry.redhat.io/devworkspace/devworkspace-project-clone-rhel9@sha256:57375c8a27a4a0fbc3febae271c3c184a797983160148abebf6a847008d40f72
+#
+# Master-branch tools base (devfile Dockerfile / OpenJDK 21)
+registry.access.redhat.com/ubi9/openjdk-21:latest
+registry.access.redhat.com/ubi9/openjdk-21-runtime:latest

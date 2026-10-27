@@ -30,6 +30,20 @@ https://DEVSPACES_URL/#https://github.com/nexus-Six/devspaces-demo/tree/v1
 Each branch’s `devfile.yaml` sets `checkoutFrom.revision` to that branch and pins the
 matching JDK via `JAVA_HOME` on the UDI tools image.
 
+### Pre-pull Dev Spaces images (faster first start)
+
+UDI + Che Code are multi‑GB images. On a cold node the first workspace start waits on pulls.
+Warm every node before a demo:
+
+```shell
+./openshift/prepull/prepull.sh
+# optional: also enable the CheCluster Kubernetes Image Puller
+./openshift/prepull/prepull.sh --che-puller
+```
+
+Edit `openshift/prepull/images.txt` to change the image list. Remove the DaemonSet (keeps the
+node cache) with `./openshift/prepull/prepull.sh --remove`.
+
 ## Demo app page
 
 ```shell
