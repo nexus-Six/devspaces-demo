@@ -6,19 +6,19 @@ workspace with the **matching JDK** — no local tool installs required.
 Different branches intentionally use **different JDKs** so the demo illustrates the
 “wrong toolchain on my laptop” problem that Dev Spaces solves:
 
-| Branch | App version        | JDK  | Devfile image                                      |
-|--------|--------------------|------|----------------------------------------------------|
-| `main` | `2.0.0-SNAPSHOT`   | 21   | `devspaces/udi-rhel9` + `JAVA_HOME` → JDK 21       |
-| `v1`   | `1.4.0-SNAPSHOT`   | 17   | `devspaces/udi-rhel9` + `JAVA_HOME` → JDK 17       |
+| Branch   | App version        | JDK  | Devfile image                                      |
+|----------|--------------------|------|----------------------------------------------------|
+| `master` | `2.0.0-SNAPSHOT`   | 21   | `devspaces/udi-rhel9` + `JAVA_HOME` → JDK 21       |
+| `v1`     | `1.4.0-SNAPSHOT`   | 17   | `devspaces/udi-rhel9` + `JAVA_HOME` → JDK 17       |
 
 ## Open in Dev Spaces (demo links)
 
 Replace `DEVSPACES_URL` with your cluster (for example `https://devspaces.apps.example.com`).
 
-**Current / latest (`main`, JDK 21):**
+**Current / latest (`master`, JDK 21):**
 
 ```text
-https://DEVSPACES_URL/#https://github.com/nexus-Six/devspaces-demo/tree/main
+https://DEVSPACES_URL/#https://github.com/nexus-Six/devspaces-demo/tree/master
 ```
 
 **Maintenance line (`v1`, JDK 17) — “fix a bug without installing an old JDK”:**
@@ -30,7 +30,7 @@ https://DEVSPACES_URL/#https://github.com/nexus-Six/devspaces-demo/tree/v1
 Each branch’s `devfile.yaml` sets `checkoutFrom.revision` to that branch and uses the
 Dev Spaces **UDI** (`registry.redhat.io/devspaces/udi-rhel9`), which already includes
 `git` and multiple JDKs. The active JDK is selected with `JAVA_HOME` / `PATH`
-(21 on `main`, 17 on `v1`).
+(21 on `master`, 17 on `v1`).
 
 ## Demo app page
 
