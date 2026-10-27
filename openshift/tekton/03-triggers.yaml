@@ -26,7 +26,6 @@ spec:
           - name: git-revision
             value: $(tt.params.git-revision)
         workspaces:
-          # volumeClaimTemplate avoids RWO PVC conflicts across concurrent runs
           - name: shared-workspace
             volumeClaimTemplate:
               spec:
@@ -47,21 +46,9 @@ spec:
   params:
     - name: git-repo-url
       value: $(body.repository.clone_url)
+    # git-clone task strips refs/heads/ if present
     - name: git-revision
       value: $(body.ref)
----
-# Map refs/heads/master → master for the git-clone task.
-apiVersion: triggers.tekton.dev/v1beta1
-kind: TriggerBinding
-metadata:
-  name: github-push-binding-branch
-  namespace: shop
-spec:
-  params:
-    - name: git-repo-url
-      value: $(body.repository.clone_url)
-    - name: git-revision
-      value: $(extensions.branch)
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
@@ -92,13 +79,8 @@ spec:
           params:
             - name: filter
               value: "body.ref == 'refs/heads/master' || body.ref == 'refs/heads/main'"
-            - name: overlays
-              value:
-                # Becomes extensions.branch for TriggerBinding substitution
-                - key: branch
-                  expression: "body.ref.split('/')[2]"
       bindings:
-        - ref: github-push-binding-branch
+        - ref: github-push-binding
       template:
         ref: shop-build-template
 ---
