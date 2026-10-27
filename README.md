@@ -32,6 +32,20 @@ Dev Spaces **UDI** (`registry.redhat.io/devspaces/udi-rhel9`), which already inc
 `git` and multiple JDKs. The active JDK is selected with `JAVA_HOME` / `PATH`
 (21 on `master`, 17 on `v1`).
 
+### Pre-pull Dev Spaces images (faster first start)
+
+UDI + Che Code are multi‑GB images. On a cold node the first workspace start waits on pulls.
+Warm every node before a demo:
+
+```shell
+./openshift/prepull/prepull.sh
+# optional: also enable the CheCluster Kubernetes Image Puller
+./openshift/prepull/prepull.sh --che-puller
+```
+
+Edit `openshift/prepull/images.txt` to change the image list. Remove the DaemonSet (keeps the
+node cache) with `./openshift/prepull/prepull.sh --remove`.
+
 ## Demo app page
 
 ```shell
