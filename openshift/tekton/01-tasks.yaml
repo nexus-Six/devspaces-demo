@@ -34,7 +34,9 @@ spec:
         set -euo pipefail
         microdnf install -y git-core >/dev/null
         find . -mindepth 1 -maxdepth 1 -exec rm -rf {} +
-        git clone --depth 1 --branch "${PARAM_REVISION}" "${PARAM_URL}" .
+        # Accept either "master" or "refs/heads/master"
+        BRANCH="${PARAM_REVISION#refs/heads/}"
+        git clone --depth 1 --branch "${BRANCH}" "${PARAM_URL}" .
         RESULT_SHA="$(git rev-parse HEAD)"
         SHORT_SHA="$(git rev-parse --short=12 HEAD)"
         echo "Cloned ${PARAM_URL}@${RESULT_SHA}"

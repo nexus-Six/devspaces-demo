@@ -26,9 +26,15 @@ spec:
           - name: git-revision
             value: $(tt.params.git-revision)
         workspaces:
+          # volumeClaimTemplate avoids RWO PVC conflicts across concurrent runs
           - name: shared-workspace
-            persistentVolumeClaim:
-              claimName: shop-pipeline-workspace
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 5Gi
         taskRunTemplate:
           serviceAccountName: pipeline
 ---
@@ -88,7 +94,8 @@ spec:
               value: "body.ref == 'refs/heads/master' || body.ref == 'refs/heads/main'"
             - name: overlays
               value:
-                - key: extensions.branch
+                # Becomes extensions.branch for TriggerBinding substitution
+                - key: branch
                   expression: "body.ref.split('/')[2]"
       bindings:
         - ref: github-push-binding-branch
