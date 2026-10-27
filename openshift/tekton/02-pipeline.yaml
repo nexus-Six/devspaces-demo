@@ -1,0 +1,70 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: shop-pipeline-workspace
+  namespace: shop
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: build-and-deploy
+  namespace: shop
+  labels:
+    app.kubernetes.io/part-of: shop-ci
+spec:
+  params:
+    - name: git-url
+      type: string
+      default: https://github.com/nexus-Six/devspaces-demo.git
+    - name: git-revision
+      type: string
+      default: master
+    - name: image-name
+      type: string
+      default: image-registry.openshift-image-registry.svc:5000/shop/rest-service
+  workspaces:
+    - name: shared-workspace
+  tasks:
+    - name: fetch-repository
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+    - name: build-image
+      runAfter:
+        - fetch-repository
+      taskRef:
+        name: buildah-build-push
+      params:
+        - name: IMAGE
+          value: "$(params.image-name):$(tasks.fetch-repository.results.short-commit)"
+        - name: DOCKERFILE
+          value: src/main/docker/Dockerfile.pipeline
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+    - name: deploy
+      runAfter:
+        - build-image
+      taskRef:
+        name: oc-deploy
+      params:
+        - name: IMAGE
+          value: "$(params.image-name):$(tasks.fetch-repository.results.short-commit)"
+        - name: NAMESPACE
+          value: shop
+        - name: APP_NAME
+          value: rest-service
