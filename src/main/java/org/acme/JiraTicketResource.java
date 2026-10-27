@@ -47,7 +47,7 @@ public class JiraTicketResource {
             <head>
               <meta charset="UTF-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1" />
-              <title>[SUMMIT-1847] Checkout fails on rest-service 1.4 — Jira</title>
+              <title>[SUMMIT-1847] Shop checkout error popup — Jira</title>
               <style>
                 :root {
                   --jira-blue: #0c66e4;
@@ -335,7 +335,7 @@ public class JiraTicketResource {
 
                 <article class="main">
                   <div class="issue-key">SUMMIT-1847 · Bug</div>
-                  <h1>Checkout API returns 500 on rest-service 1.4 (production hot-fix)</h1>
+                  <h1>Shop checkout fails with error popup (Quarkus Merch demo)</h1>
 
                   <div class="actions">
                     <a class="btn btn-primary" href="%s" target="_blank" rel="noopener">
@@ -349,14 +349,17 @@ public class JiraTicketResource {
                   <div class="section-title">Description</div>
                   <div class="description">
                     <p>
-                      Customers on the <strong>1.4.x</strong> line hit a 500 when completing checkout.
-                      We need a surgical fix on the maintenance branch — not on <code>main</code> (2.x / JDK 21).
+                      The <a href="/shop/">Quarkus Merch</a> shop lets customers add the
+                      <strong>“Quarkus rocks”</strong> tee to the cart, but
+                      <strong>Checkout</strong> always shows an error popup
+                      (<code>Payment gateway returned HTTP 500</code>).
+                      Reproduce on the maintenance branch — not on <code>main</code> (2.x / JDK 21).
                       That line still runs on <strong>OpenJDK %s</strong>, which most laptops no longer have installed.
                     </p>
                     <ul>
-                      <li>Affects version: <code>1.4.0-SNAPSHOT</code></li>
-                      <li>Runtime in prod: <strong>OpenJDK %s</strong></li>
-                      <li>Repo branch to use: <code>%s</code></li>
+                      <li>Reproduce: open <code>/shop/</code> → Add to cart → Checkout</li>
+                      <li>Fix: in <code>META-INF/resources/shop/app.js</code>, set <code>CHECKOUT_BUG = false</code></li>
+                      <li>Affects version: <code>1.4.0-SNAPSHOT</code> · branch <code>%s</code> · OpenJDK %s</li>
                     </ul>
                     <p>
                       Please reproduce and patch in a cloud workspace so you do not need to juggle
@@ -389,7 +392,8 @@ public class JiraTicketResource {
                     <ul>
                       <li>Workspace opens from the Jira link with <code>%s</code> checked out</li>
                       <li>Container JDK matches %s (see app landing page badge) — different from <code>main</code> / JDK 21</li>
-                      <li>Bug fixed and verified with <code>./mvnw quarkus:dev</code></li>
+                      <li>Checkout on <code>/shop/</code> succeeds after flipping <code>CHECKOUT_BUG</code> to <code>false</code></li>
+                      <li>Verified with <code>./mvnw quarkus:dev</code> (or <code>quarkus dev</code>)</li>
                     </ul>
                   </div>
 
@@ -457,6 +461,8 @@ public class JiraTicketResource {
 
                 <p class="footer-note">
                   Demo mock · not affiliated with Atlassian ·
+                  <a href="/shop/" style="color:var(--jira-blue)">Open shop</a>
+                  ·
                   <a href="/" style="color:var(--jira-blue)">Back to app</a>
                 </p>
               </div>
@@ -465,8 +471,8 @@ public class JiraTicketResource {
             """.formatted(
                 factoryFromBranch, // primary CTA href
                 jdkVersion,        // description: maintenance JDK
-                jdkVersion,        // runtime in prod
-                branch,            // repo branch to use
+                branch,            // affects: branch
+                jdkVersion,        // affects: OpenJDK
                 branch,            // CTA branch
                 jdkVersion,        // CTA OpenJDK
                 devfilePath,       // CTA devfile name
