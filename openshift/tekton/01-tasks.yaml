@@ -1,0 +1,159 @@
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: git-clone
+  namespace: shop
+  labels:
+    app.kubernetes.io/part-of: shop-ci
+spec:
+  params:
+    - name: url
+      type: string
+    - name: revision
+      type: string
+      default: master
+  workspaces:
+    - name: output
+  results:
+    - name: commit
+      description: The precise commit SHA that was fetched
+    - name: short-commit
+      description: Short commit SHA for image tags
+  steps:
+    - name: clone
+      image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+      workingDir: $(workspaces.output.path)
+      env:
+        - name: PARAM_URL
+          value: $(params.url)
+        - name: PARAM_REVISION
+          value: $(params.revision)
+      script: |
+        #!/bin/bash
+        set -euo pipefail
+        microdnf install -y git-core >/dev/null
+        find . -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+        # Accept either "master" or "refs/heads/master"
+        BRANCH="${PARAM_REVISION#refs/heads/}"
+        git clone --depth 1 --branch "${BRANCH}" "${PARAM_URL}" .
+        RESULT_SHA="$(git rev-parse HEAD)"
+        SHORT_SHA="$(git rev-parse --short=12 HEAD)"
+        echo "Cloned ${PARAM_URL}@${RESULT_SHA}"
+        printf '%s' "${RESULT_SHA}" > "$(results.commit.path)"
+        printf '%s' "${SHORT_SHA}" > "$(results.short-commit.path)"
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: buildah-build-push
+  namespace: shop
+  labels:
+    app.kubernetes.io/part-of: shop-ci
+spec:
+  params:
+    - name: IMAGE
+      type: string
+      description: Fully qualified image reference to push
+    - name: DOCKERFILE
+      type: string
+      default: src/main/docker/Dockerfile.pipeline
+    - name: CONTEXT
+      type: string
+      default: .
+    - name: IGNOREFILE
+      type: string
+      default: src/main/docker/dockerignore.pipeline
+      description: Dockerignore that keeps sources (root .dockerignore is for prebuilt JVM images)
+  workspaces:
+    - name: source
+  steps:
+    - name: build-and-push
+      image: registry.redhat.io/rhel9/buildah:latest
+      workingDir: $(workspaces.source.path)
+      securityContext:
+        capabilities:
+          add: ["SETFCAP"]
+      env:
+        - name: STORAGE_DRIVER
+          value: vfs
+        - name: BUILDAH_ISOLATION
+          value: chroot
+        - name: BUILDAH_FORMAT
+          value: docker
+      script: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+        IMAGE="$(params.IMAGE)"
+        DOCKERFILE="$(params.DOCKERFILE)"
+        CONTEXT="$(params.CONTEXT)"
+        IGNOREFILE="$(params.IGNOREFILE)"
+        echo "Building ${IMAGE} from ${DOCKERFILE} (ignorefile=${IGNOREFILE})"
+        buildah bud --storage-driver="${STORAGE_DRIVER}" \
+          --isolation="${BUILDAH_ISOLATION}" \
+          --layers=false \
+          --ignorefile "${IGNOREFILE}" \
+          -f "${DOCKERFILE}" \
+          -t "${IMAGE}" \
+          "${CONTEXT}"
+        echo "Pushing ${IMAGE}"
+        buildah push --storage-driver="${STORAGE_DRIVER}" \
+          --tls-verify=false \
+          "${IMAGE}" \
+          "docker://${IMAGE}"
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: oc-deploy
+  namespace: shop
+  labels:
+    app.kubernetes.io/part-of: shop-ci
+spec:
+  params:
+    - name: IMAGE
+      type: string
+    - name: NAMESPACE
+      type: string
+      default: shop
+    - name: APP_NAME
+      type: string
+      default: rest-service
+  steps:
+    - name: deploy
+      image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+      script: |
+        #!/bin/bash
+        set -euo pipefail
+        NS="$(params.NAMESPACE)"
+        APP="$(params.APP_NAME)"
+        IMAGE="$(params.IMAGE)"
+        echo "Deploying ${APP} in ${NS} with image ${IMAGE}"
+
+        if ! oc -n "${NS}" get deploy "${APP}" >/dev/null 2>&1; then
+          oc -n "${NS}" create deployment "${APP}" --image="${IMAGE}"
+        fi
+
+        oc -n "${NS}" label deploy/"${APP}" app="${APP}" --overwrite
+        oc -n "${NS}" patch deploy/"${APP}" --type=strategic -p "{
+          \"spec\": {
+            \"selector\": {\"matchLabels\": {\"app\": \"${APP}\"}},
+            \"template\": {
+              \"metadata\": {\"labels\": {\"app\": \"${APP}\"}},
+              \"spec\": {
+                \"containers\": [{
+                  \"name\": \"${APP}\",
+                  \"image\": \"${IMAGE}\",
+                  \"ports\": [{\"containerPort\": 8080, \"name\": \"http\"}],
+                  \"readinessProbe\": {
+                    \"httpGet\": {\"path\": \"/hello\", \"port\": 8080},
+                    \"initialDelaySeconds\": 5,
+                    \"periodSeconds\": 5
+                  }
+                }]
+              }
+            }
+          }
+        }"
+
+        oc -n "${NS}" rollout status "deploy/${APP}" --timeout=300s

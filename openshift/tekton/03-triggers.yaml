@@ -1,0 +1,103 @@
+# github-webhook-secret is created by the setup script (not stored in git).
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: shop-build-template
+  namespace: shop
+spec:
+  params:
+    - name: git-repo-url
+    - name: git-revision
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1
+      kind: PipelineRun
+      metadata:
+        generateName: shop-build-
+        namespace: shop
+        labels:
+          app.kubernetes.io/part-of: shop-ci
+      spec:
+        pipelineRef:
+          name: build-and-deploy
+        params:
+          - name: git-url
+            value: $(tt.params.git-repo-url)
+          - name: git-revision
+            value: $(tt.params.git-revision)
+        workspaces:
+          - name: shared-workspace
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 5Gi
+        taskRunTemplate:
+          serviceAccountName: pipeline
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: github-push-binding
+  namespace: shop
+spec:
+  params:
+    - name: git-repo-url
+      value: $(body.repository.clone_url)
+    # git-clone task strips refs/heads/ if present
+    - name: git-revision
+      value: $(body.ref)
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: github-listener
+  namespace: shop
+  labels:
+    app.kubernetes.io/part-of: shop-ci
+spec:
+  serviceAccountName: pipeline
+  triggers:
+    - name: github-push-master
+      interceptors:
+        - ref:
+            name: github
+            kind: ClusterInterceptor
+          params:
+            - name: secretRef
+              value:
+                secretName: github-webhook-secret
+                secretKey: secretToken
+            - name: eventTypes
+              value:
+                - push
+        - ref:
+            name: cel
+            kind: ClusterInterceptor
+          params:
+            - name: filter
+              value: "body.ref == 'refs/heads/master' || body.ref == 'refs/heads/main'"
+      bindings:
+        - ref: github-push-binding
+      template:
+        ref: shop-build-template
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: el-github-listener
+  namespace: shop
+  labels:
+    app.kubernetes.io/part-of: shop-ci
+    eventlistener: github-listener
+spec:
+  to:
+    kind: Service
+    name: el-github-listener
+  port:
+    targetPort: http-listener
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

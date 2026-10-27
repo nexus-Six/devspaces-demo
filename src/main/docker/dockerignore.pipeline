@@ -1,0 +1,13 @@
+# Used by Tekton buildah (--ignorefile) with Dockerfile.pipeline.
+# Keep sources + Maven wrapper; drop build junk and VCS metadata.
+.git
+.github
+.target
+**/target
+.idea
+*.iml
+.vscode
+openshift
+README.md
+.env
+.env.*

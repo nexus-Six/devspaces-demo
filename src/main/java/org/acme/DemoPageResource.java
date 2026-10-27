@@ -138,7 +138,8 @@ public class DemoPageResource {
                 <div class="panel">
                   Hello from <strong>%s</strong>!<br />
                   Try the classic endpoint at <a href="/hello"><code>/hello</code></a>.<br />
-                  Demo the onboarding story: open the fake
+                  Reproduce the checkout bug in the
+                  <a href="/shop/"><code>Quarkus Merch shop</code></a>, then open the fake
                   <a href="/jira"><code>Jira ticket</code></a> and click
                   <em>Open in OpenShift Dev Spaces</em>.
                 </div>

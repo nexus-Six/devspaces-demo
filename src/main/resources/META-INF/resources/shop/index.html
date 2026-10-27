@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quarkus Merch — Official Shop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/shop/">
+      <span class="brand-mark" aria-hidden="true">Q</span>
+      <span class="brand-name">Quarkus Merch</span>
+    </a>
+    <nav class="header-actions" aria-label="Cart">
+      <button type="button" class="cart-toggle" id="cartToggle" aria-expanded="false" aria-controls="cartPanel">
+        Cart
+        <span class="cart-badge" id="cartBadge" hidden>0</span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="shop">
+    <section class="hero-product" aria-labelledby="product-title">
+      <div class="product-visual" aria-hidden="true">
+        <svg class="tshirt" viewBox="0 0 320 360" role="img" aria-label="Quarkus rocks t-shirt">
+          <defs>
+            <linearGradient id="fabric" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#1a2744" />
+              <stop offset="100%" stop-color="#0f1729" />
+            </linearGradient>
+          </defs>
+          <path fill="url(#fabric)" d="M110 48 L160 70 L210 48 L270 90 L240 120 L220 108 V300 H100 V108 L80 120 L50 90 Z" />
+          <path fill="#243556" d="M110 48 L160 70 L210 48 L195 36 L160 52 L125 36 Z" />
+          <text x="160" y="190" text-anchor="middle" class="tee-text">Quarkus</text>
+          <text x="160" y="222" text-anchor="middle" class="tee-text tee-text-accent">rocks</text>
+        </svg>
+      </div>
+
+      <div class="product-copy">
+        <p class="eyebrow">Limited drop</p>
+        <h1 id="product-title">“Quarkus rocks” Tee</h1>
+        <p class="price"><span id="productPrice">€29.00</span></p>
+        <p class="blurb">
+          Soft organic cotton, deep midnight dye, and the only slogan your cloud-native wardrobe needs.
+          One size fits most — just like a good microservice.
+        </p>
+        <div class="product-actions">
+          <button type="button" class="btn btn-primary" id="addToCart">Add to cart</button>
+          <button type="button" class="btn btn-ghost" id="openCartFromProduct">View cart</button>
+        </div>
+        <p class="stock" id="stockNote">In stock · ships in 2 days</p>
+      </div>
+    </section>
+  </main>
+
+  <aside class="cart-panel" id="cartPanel" aria-hidden="true" aria-labelledby="cartHeading">
+    <div class="cart-panel-inner">
+      <div class="cart-header">
+        <h2 id="cartHeading">Your cart</h2>
+        <button type="button" class="icon-close" id="closeCart" aria-label="Close cart">×</button>
+      </div>
+      <ul class="cart-lines" id="cartLines"></ul>
+      <p class="cart-empty" id="cartEmpty">Your cart is empty.</p>
+      <div class="cart-footer" id="cartFooter" hidden>
+        <div class="cart-total">
+          <span>Total</span>
+          <strong id="cartTotal">€0.00</strong>
+        </div>
+        <button type="button" class="btn btn-primary btn-block" id="checkout">Checkout</button>
+      </div>
+    </div>
+  </aside>
+  <div class="cart-backdrop" id="cartBackdrop" hidden></div>
+
+  <div class="modal" id="errorModal" role="alertdialog" aria-modal="true" aria-labelledby="errorTitle" aria-describedby="errorBody" hidden>
+    <div class="modal-card">
+      <div class="modal-icon" aria-hidden="true">!</div>
+      <h2 id="errorTitle">Checkout failed</h2>
+      <p id="errorBody" class="modal-body"></p>
+      <p class="modal-hint" id="errorHint"></p>
+      <button type="button" class="btn btn-primary" id="dismissError">Close</button>
+    </div>
+  </div>
+
+  <div class="modal modal-success" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successTitle" hidden>
+    <div class="modal-card">
+      <div class="modal-icon success" aria-hidden="true">✓</div>
+      <h2 id="successTitle">Order placed</h2>
+      <p class="modal-body">Thanks! Your Quarkus tee is on its way.</p>
+      <button type="button" class="btn btn-primary" id="dismissSuccess">Done</button>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <a href="/">Demo home</a>
+    ·
+    <a href="/jira">Jira ticket SUMMIT-1847</a>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

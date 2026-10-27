@@ -47,8 +47,11 @@ published **http-app** endpoint from the IDE Ports / popup (“Open in New Tab�
 
 ### Fake Jira ticket (Dev Spaces hand-off)
 
+Open <http://localhost:8080/shop/> — Quarkus Merch demo shop (add tee to cart; Checkout shows the bug).
+
 Open <http://localhost:8080/jira> — a mock Jira issue with an
 **Open in OpenShift Dev Spaces** button that points at the `v1` branch (JDK 17) / `devfile.yaml`.
+Fix: in `src/main/resources/META-INF/resources/shop/app.js`, set `CHECKOUT_BUG = false`.
 
 Configure the factory link: put the cluster Dev Spaces URL in a local **`.env`**
 (gitignored — copy from `.env.example`), or rely on the workshop default in

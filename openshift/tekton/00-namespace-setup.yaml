@@ -1,0 +1,42 @@
+# Applied into project "shop". Creates ImageStream + runtime Service/Route
+# (Deployment is created/updated by the pipeline).
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: rest-service
+  namespace: shop
+  labels:
+    app: rest-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rest-service
+  namespace: shop
+  labels:
+    app: rest-service
+spec:
+  selector:
+    app: rest-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: rest-service
+  namespace: shop
+  labels:
+    app: rest-service
+spec:
+  to:
+    kind: Service
+    name: rest-service
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
